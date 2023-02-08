@@ -1,6 +1,6 @@
 import React from "react";
 
-function CreateUser({ username, email, onChange, onCreate }) {
+const CreateUser = ({ username, email, onChange, onCreate }) => {
     return (
         <div>
             <input
@@ -20,4 +20,8 @@ function CreateUser({ username, email, onChange, onCreate }) {
     );
 }
 
-export default CreateUser;
+export default React.memo(CreateUser);
+
+//function -> const, = =>
+//CreateUser -> React.memo(CreateUser) 
+//React.memo(컴포넌트의 props가 바뀌지 않았다면 리렌더링을 방지해 최적화를 해주는 함수)로 감싸주기만 하면 끝 

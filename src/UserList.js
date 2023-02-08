@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
 
-function User({ user , onRemove , onToggle }) {
-    useEffect(() => {
-        //console.log(user);
-    });
+const User = React.memo(function User({ user , onRemove , onToggle }) {
     return(
         <div>
             <b 
@@ -18,7 +15,7 @@ function User({ user , onRemove , onToggle }) {
             <button onClick={() => onRemove(user.id)}>삭제</button>
         </div>
     );
-}
+});
 
 function UserList({ users, onRemove, onToggle}) { //UserList 컴포넌트가 받아온 함수들
     return (
@@ -35,4 +32,4 @@ function UserList({ users, onRemove, onToggle}) { //UserList 컴포넌트가 받
     );
 }
 
-export default UserList;
+export default React.memo(UserList);
