@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import UserList from "./UserList";
 import CreateUser from "./CreateUser";
 
@@ -73,7 +73,10 @@ function App(){
     ); //map으로 배열의 불변성을 유지하며 배열 업데이트
   }; //id값을 비교해서 같을 때 active값을 반전해 배열 업데이트 : 다를 때 그대로 유지
 
-  const count = countActiveUsers(users);
+  const count = useMemo(() => countActiveUsers(users), [users]);
+  //useMemo(어떻게 연산할지 정의하는 함수, deps배열)
+  //deps배열 안의 내용이 바뀌면 등록한 함수를 호출해 값을 연산, 바뀌지 않았으면 이전 연산값 재사용
+  //input값이 바뀔 때도 countActiveUsers가 호출되는 현상을 막아줌 (users의 변화에만 호출되도록)
 
   return (
     <>
