@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import UserList from "./UserList";
 import CreateUser from "./CreateUser";
 
@@ -15,13 +15,16 @@ function App(){
 
   const { username, email } = inputs;
 
-  const onChange = e => {
-    const { name, value } = e.target;
-    setInputs({
-      ...inputs,
-      [name]: value
-    });
-  };
+  const onChange = useCallback(
+    e => {
+      const { name, value } = e.target;
+      setInputs({
+        ...inputs,
+        [name]: value
+      });
+    },
+    [inputs]
+  );
 
   const [users, setUsers] = useState([
     {
@@ -46,7 +49,7 @@ function App(){
 
   const nextId = useRef(4);
 
-  const onCreate = () => {
+  const onCreate = useCallback(() => {
     const user = {
       id: nextId.current,
       username,
@@ -59,19 +62,24 @@ function App(){
       email: ''
     });
     nextId.current += 1;
-  };
+  }, [users, username, email]);
 
-  const onRemove = id => {
-    //user.id가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
-    // = user.id가 id인 것을 제거함
-    setUsers(users.filter(user => user.id !== id));
-  };
+  const onRemove = useCallback(
+    id => {
+      //user.id가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
+      // = user.id가 id인 것을 제거함
+      setUsers(users.filter(user => user.id !== id));
+    }, [users]
+  );
 
-  const onToggle = id => {
-    setUsers(
-      users.map(user => user.id === id ? { ...user, active: !user.active } : user )
-    ); //map으로 배열의 불변성을 유지하며 배열 업데이트
-  }; //id값을 비교해서 같을 때 active값을 반전해 배열 업데이트 : 다를 때 그대로 유지
+  const onToggle = useCallback(
+    id => {
+      setUsers(
+        users.map(user => user.id === id ? { ...user, active: !user.active } : user )
+      ); //map으로 배열의 불변성을 유지하며 배열 업데이트
+    }, //id값을 비교해서 같을 때 active값을 반전해 배열 업데이트 : 다를 때 그대로 유지
+    [users]
+  );
 
   const count = useMemo(() => countActiveUsers(users), [users]);
   //useMemo(어떻게 연산할지 정의하는 함수, deps배열)
