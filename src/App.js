@@ -1,6 +1,7 @@
 import React, { useReducer, useRef, useMemo, useCallback } from "react";
 import UserList from "./UserList";
 import CreateUser from "./CreateUser";
+import produce from 'immer'; 
 
 function countActiveUsers(users) {
   console.log('활성 사용자 수를 세는중...');
@@ -35,23 +36,21 @@ const initialState ={
 function reducer(state, action){
   switch (action.type){
     case 'CREATE_USER':
-      return{
-        users: state.users.concat(action.user)
-      };
+      return produce(state, draft => {
+        draft.users.push(action.user);
+        //concat 대신 immer사용 연습
+      });
     //4. onCreate(배열에 항목 추가하는 로직)구현. 
     case 'TOGGLE_USER':
-      return {
-        ...state,
-        users: state.users.map(user =>
-          user.id === action.id ? { ...user, active: !user.active } : user
-        )
-      };
+      return produce(state, draft => {
+        const user = draft.users.find(user => user.id === action.id);
+        user.active = !user.active;  //...(spread) 대신 immer
+      });
     //5. onToggle(id값을 비교해 id가 같으면 active를 반전시키도록. 눌렀을때 색 바뀌는 로직) 구현
     case 'REMOVE_USER':
-      return {
-        ...state,
-        users: state.users.filter(user => user.id !== action.id)
-      };
+      return produce(state, draft => {
+        const index = draft.users.findIndex(user => user.id === action.id);
+      }); //여기도 immer연습...
     //6. onRemove(user.id가 파라미터로 일치하지 않는 원소만 추출 = id인 것을 삭제) 구현.
     default:
       return state;
