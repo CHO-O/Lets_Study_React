@@ -1,6 +1,7 @@
 import React, { useReducer, useRef, useMemo, useCallback } from "react";
 import UserList from "./UserList";
 import CreateUser from "./CreateUser";
+import useInputs from "./hooks/useInputs";
 
 function countActiveUsers(users) {
   console.log('활성 사용자 수를 세는중...');
@@ -8,10 +9,6 @@ function countActiveUsers(users) {
 } //active값이 true인 사용자의 수를 세었음
 
 const initialState ={
-  inputs: {
-    username: '',
-    email: '',
-  },
   users: [
     {
       id:1,
@@ -38,19 +35,8 @@ const initialState ={
 
 function reducer(state, action){
   switch (action.type){
-    case 'CHANGE_INPUT':
-      return{
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.name]: action.value
-        }
-      };
-    //3. onChange부분부터 구현. 'CHANGE_INPUT' 액션 객체를 이용해 inputs 상태를 업데이트 해줌
-    //   reducer함수에서 새로운 상태 만들 때 불변성 지킬 것(spread)
     case 'CREATE_USER':
       return{
-        inputs: initialState.inputs,
         users: state.users.concat(action.user)
       };
     //4. onCreate(배열에 항목 추가하는 로직)구현. 
@@ -75,23 +61,17 @@ function reducer(state, action){
 //1. reducer함수의 틀 만듬
 
 function App(){
+  const [{ username, email }, onChange, reset] = useInputs({
+    username: '',
+    email: ''
+  });
+  //기존 코드에 존재하는 inputs들, onchange를 전부 없앰
+  //새로운 항목을 추가할 때 input값을 초기화하기 위한 reset() 호출
+
   const [state, dispatch] = useReducer(reducer, initialState);
   const nextId = useRef(4);
 
   const { users } = state;
-  const { username, email } = state.inputs;
-  //2. useReducer의 기본 형태 작성 및
-  //state에서 필요한 값들을 비구조화 할당 문법으로 추출해 각 컴포넌트들에게 전달함
-
-  const onChange = useCallback(e => {
-    const { name, value } = e.target;
-    dispatch({
-      type: 'CHANGE_INPUT',
-      name,
-      value
-    });
-  }, []);
-  //3. onChange 구현
 
   const onCreate = useCallback(() => {
     dispatch({
@@ -102,8 +82,9 @@ function App(){
         email
       }
     });
+    reset(); //초기화. onCreate는 input값을 사용하니까...
     nextId.current += 1;
-  }, [username, email]);
+  }, [username, email, reset]);
   //4. onCreate 구현
 
   const onToggle = useCallback(id => {
